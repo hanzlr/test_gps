@@ -17,9 +17,6 @@ let fullscreen = false;
 
 const map = L.map("map");
 
-// TAMPILAN AWAL
-// SEBELUM GPS FIX
-
 map.setView([0, 0], 2);
 
 // ======================
@@ -43,6 +40,16 @@ let marker;
 async function loadGPS() {
   try {
     // ======================
+    // CEK DEVICE ONLINE
+    // ======================
+
+    const connResp = await fetch(
+      `https://blynk.cloud/external/api/isHardwareConnected?token=${TOKEN}`,
+    ).then((r) => r.text());
+
+    const deviceOnline = connResp.trim() === "true";
+
+    // ======================
     // LATITUDE
     // ======================
 
@@ -61,6 +68,11 @@ async function loadGPS() {
     lat = parseFloat(lat);
     lon = parseFloat(lon);
 
+    document.getElementById("gpsText").innerText =
+      deviceOnline && !isNaN(lat) && !isNaN(lon)
+        ? "GPS Sudah Lock"
+        : "GPS Belum Lock";
+
     // ======================
     // UPDATE MAP
     // ======================
@@ -74,8 +86,6 @@ async function loadGPS() {
         marker = L.marker([lat, lon]).addTo(map);
 
         marker.bindPopup("GPS TRACKER");
-
-        // AUTO FOCUS KE GPS
 
         map.setView([lat, lon], 18);
       }
@@ -111,7 +121,9 @@ async function loadGPS() {
       `https://blynk.cloud/external/api/get?token=${TOKEN}&V6`,
     ).then((r) => r.text());
 
-    document.getElementById("signalText").innerText = signal;
+    document.getElementById("signalText").innerText = deviceOnline
+      ? signal
+      : "-";
 
     // ======================
     // GEOFENCE
@@ -138,7 +150,7 @@ async function loadGPS() {
     ).then((r) => r.text());
 
     document.getElementById("internetText").innerText =
-      internet == "1" ? "ONLINE" : "OFFLINE";
+      deviceOnline && internet == "1" ? "ONLINE" : "OFFLINE";
   } catch (err) {
     console.log(err);
   }
