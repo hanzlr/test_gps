@@ -45,6 +45,7 @@ A real-time GPS tracking web dashboard built with ESP32 + SIM7600, integrated wi
 ## Project Structure
 
 ```
+GPS TRACKER
 ├── index.html          # Main dashboard
 ├── script.js           # Blynk API logic & map
 ├── style.css           # Dashboard styling
